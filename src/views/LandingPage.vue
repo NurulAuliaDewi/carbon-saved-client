@@ -29,6 +29,14 @@
         and contribute to a <span class="highlight-green">greener future</span> with Bike to Work.
       </p>
 
+      <button class="cta" @click="goToDashboard">
+        <span class="cta-text">
+          <i class="fas fa-chart-line"></i> 
+          View Dashboard
+        </span>
+        <div class="cta-ripple"></div>
+      </button>
+
       <div class="summary-section">
         <h2 class="summary-title">Summary Overview</h2>
         
@@ -123,13 +131,7 @@
         </div>
       </div>
 
-      <button class="cta" @click="goToDashboard">
-        <span class="cta-text">
-          <i class="fas fa-chart-line"></i> 
-          View Dashboard
-        </span>
-        <div class="cta-ripple"></div>
-      </button>
+      
     </div>
 
     <div class="scroll-indicator">
@@ -178,8 +180,8 @@ export default {
       activities: [
         { label: 'Daily Cyclists', percentage: 0, count: '-', key: 'every_day' },
         { label: '4-6 Days/Week', percentage: 0, count: '-', key: '4_to_6_days' },
-        { label: '2-3 Days/Week', percentage: 0, count: '-', key: '3_days' },
-        { label: '1-2 Days/Week', percentage: 0, count: '-', key: 'less_than_3_days' }
+        { label: '2-3 Days/Week', percentage: 0, count: '-', key: '2_to_3_days' },
+        { label: '1 Days/Week', percentage: 0, count: '-', key: '1_day' }
       ],
       topAthletes: [],
       apiBaseUrl: process.env.VUE_APP_API_URL || 'https://carbonsaved.b2w-id.org/api'
