@@ -689,7 +689,7 @@ export default {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
-  min-width: 600px;
+  min-width: 120px;
 }
 
 .modern-table thead {

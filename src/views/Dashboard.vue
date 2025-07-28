@@ -540,6 +540,8 @@ export default {
 
     getChartOptions(data) {
       let periodLabel = this.period.charAt(0).toUpperCase() + this.period.slice(1);
+      
+      // Add specific month/year to chart titles
       if (this.period === 'month') {
         const monthName = this.allMonths.find(m => m.value === this.selectedMonth)?.label || '';
         periodLabel = `${monthName} ${this.selectedYear}`;
@@ -550,6 +552,8 @@ export default {
       }
       
       const { short, mid } = THRESHOLDS[this.period];
+      
+      // Base chart configuration untuk konsistensi
       const baseConfig = {
         chart: {
           toolbar: {
@@ -1030,7 +1034,7 @@ export default {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
-  min-width: 600px;
+  min-width: 120px;
 }
 
 .modern-table thead {
