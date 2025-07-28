@@ -129,7 +129,7 @@
 <script>
 import axios from 'axios';
 
-const API_BASE_URL = 'https://carbonsaved.b2w-id.org';
+const API_BASE_URL = 'https://carbonsaved.b2w-id.org/api';
 
 export default {
   name: "DetailView",
