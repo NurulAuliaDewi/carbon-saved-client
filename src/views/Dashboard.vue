@@ -143,32 +143,35 @@
           </div>
         </div>
       </div>
+      <!-- Updated table section with horizontal scroll wrapper -->
       <div class="table-container">
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Commuter</th>
-              <th>Distance (KM)</th>
-              <th>Moving Time</th>
-              <th>Carbon Saving (kg CO<sub>2</sub>)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="(athlete, index) in filteredAthletes" 
-              :key="athlete.id_athlete" 
-              @click="$router.push(`/detail/${athlete.id_athlete}`)"
-              class="table-row"
-            >
-              <td>{{ index + 1 }}</td>
-              <td class="commuter-name">{{ athlete.fullName }}</td>
-              <td>{{ athlete.distance }}</td>
-              <td>{{ athlete.movingTime }}</td>
-              <td class="carbon-value">{{ athlete.carbonSaving }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Commuter</th>
+                <th>Distance (KM)</th>
+                <th>Moving Time</th>
+                <th>Carbon Saving (kg CO<sub>2</sub>)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                v-for="(athlete, index) in filteredAthletes" 
+                :key="athlete.id_athlete" 
+                @click="$router.push(`/detail/${athlete.id_athlete}`)"
+                class="table-row"
+              >
+                <td>{{ index + 1 }}</td>
+                <td class="commuter-name" :title="athlete.fullName">{{ athlete.fullName }}</td>
+                <td>{{ athlete.distance }}</td>
+                <td>{{ athlete.movingTime }}</td>
+                <td class="carbon-value">{{ athlete.carbonSaving }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div v-if="isLoading" class="loading-container">
         <div class="loading-spinner"></div>
@@ -185,7 +188,7 @@
 import ApexCharts from 'apexcharts';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://carbonsaved.b2w-id.org';
 const THRESHOLDS = {
   day: { short: 15, mid: 30 },
   month: { short: 300, mid: 500 },
@@ -550,6 +553,7 @@ export default {
       }
       
       const { short, mid } = THRESHOLDS[this.period];
+
       const baseConfig = {
         chart: {
           toolbar: {
@@ -1014,7 +1018,7 @@ export default {
 }
 
 
-/* Modern Table */
+/* Modern Table - Updated with horizontal scroll for mobile */
 .table-container {
   background: white;
   border-radius: 20px;
@@ -1023,12 +1027,20 @@ export default {
   overflow: hidden;
   max-height: 400px;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Table wrapper for horizontal scroll */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
 }
 
 .modern-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  min-width: 600px; /* minimum width to prevent squashing */
 }
 
 .modern-table thead {
@@ -1046,6 +1058,7 @@ export default {
   font-size: 0.875rem;
   letter-spacing: 0.5px;
   border: none;
+  white-space: nowrap; /* prevent text wrapping in headers */
 }
 
 .modern-table td {
@@ -1053,6 +1066,7 @@ export default {
   border-bottom: 1px solid #f8f9fa;
   font-size: 0.875rem;
   color: #495057;
+  white-space: nowrap; /* prevent text wrapping in cells */
 }
 
 .table-row {
@@ -1072,6 +1086,9 @@ export default {
 .commuter-name {
   font-weight: 600;
   color: #2A67AD;
+  max-width: 150px; /* limit name width */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .carbon-value {
@@ -1109,13 +1126,36 @@ export default {
     height: 300px;
   }
   
+  /* Table responsive adjustments */
+  .table-container {
+    margin: 0 -1rem; /* extend to screen edges on mobile */
+    border-radius: 0; /* remove border radius on mobile for better UX */
+    max-height: 350px;
+  }
+  
   .modern-table {
-    font-size: 0.75rem;
+    min-width: 650px; /* ensure minimum width for proper layout */
   }
   
   .modern-table th,
   .modern-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Add scroll indicator on mobile */
+  .table-container::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(42, 103, 173, 0.1);
+    color: #2A67AD;
+    font-size: 0.75rem;
+    text-align: center;
     padding: 0.5rem;
+    font-weight: 500;
+    border-top: 1px solid rgba(42, 103, 173, 0.2);
   }
 }
 
@@ -1137,6 +1177,25 @@ export default {
   .chart-container {
     height: 280px;
   }
+  
+  /* Extra small mobile adjustments */
+  .table-container {
+    max-height: 300px;
+  }
+  
+  .modern-table {
+    min-width: 580px;
+  }
+  
+  .modern-table th,
+  .modern-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.75rem;
+  }
+  
+  .commuter-name {
+    max-width: 120px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -1145,9 +1204,10 @@ export default {
   }
 }
 
-/* Scrollbar Styling */
+/* Enhanced Scrollbar Styling */
 .table-container::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .table-container::-webkit-scrollbar-track {
@@ -1160,6 +1220,25 @@ export default {
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
+  background: #1a4a7a;
+}
+
+/* Horizontal scrollbar styling */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #2A67AD;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
   background: #1a4a7a;
 }
 

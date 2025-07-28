@@ -182,7 +182,7 @@ export default {
         { label: '1-2 Days/Week', percentage: 0, count: '-', key: 'less_than_3_days' }
       ],
       topAthletes: [],
-      apiBaseUrl: process.env.VUE_APP_API_URL || 'http://localhost:5000'
+      apiBaseUrl: process.env.VUE_APP_API_URL || 'https://carbonsaved.b2w-id.org'
     }
   },
   async mounted() {

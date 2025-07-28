@@ -87,36 +87,40 @@
         <h4 class="text-primary fw-bold mb-4">Activity History</h4>
       </div>
       <div v-if="activities.length > 0" class="table-container">
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Commuter</th>
-              <th>Route Name</th>
-              <th>Distance (km)</th>
-              <th>Moving Time</th>
-              <th>Activity Date</th>
-              <th>Elevation Gain</th>
-              <th>Carbon Saving (kg CO<sub>2</sub>)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="(activity, index) in activities" 
-              :key="activity.id"
-              class="table-row"
-            >
-              <td>{{ index + 1 }}</td>
-              <td class="commuter-name">{{ activity.athlete_firstname }} {{ activity.athlete_lastname }}</td>
-              <td class="route-name">{{ activity.activity_name }}</td>
-              <td>{{ formatDistance(activity.distance) }}</td>
-              <td>{{ formatTime(activity.moving_time) }}</td>
-              <td>{{ new Date(activity.datetime).toDateString() }}</td>
-              <td>{{ activity.total_elevation_gain }}</td>
-              <td class="carbon-value">{{ formatCarbonSaving(activity.carbon_saving) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Commuter</th>
+                <th>Route Name</th>
+                <th>Distance (km)</th>
+                <th>Moving Time</th>
+                <th>Activity Date</th>
+                <th>Elevation Gain</th>
+                <th>Carbon Saving (kg CO<sub>2</sub>)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                v-for="(activity, index) in activities" 
+                :key="activity.id"
+                class="table-row"
+              >
+                <td>{{ index + 1 }}</td>
+                <td class="commuter-name" :title="`${activity.athlete_firstname} ${activity.athlete_lastname}`">
+                  {{ activity.athlete_firstname }} {{ activity.athlete_lastname }}
+                </td>
+                <td class="route-name" :title="activity.activity_name">{{ activity.activity_name }}</td>
+                <td>{{ formatDistance(activity.distance) }}</td>
+                <td>{{ formatTime(activity.moving_time) }}</td>
+                <td>{{ new Date(activity.datetime).toDateString() }}</td>
+                <td>{{ activity.total_elevation_gain }}</td>
+                <td class="carbon-value">{{ formatCarbonSaving(activity.carbon_saving) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -125,7 +129,7 @@
 <script>
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://carbonsaved.b2w-id.org';
 
 export default {
   name: "DetailView",
@@ -669,7 +673,7 @@ export default {
   color: #002147;
 }
 
-/* Modern Table */
+/* Modern Table - Updated with horizontal scroll for mobile */
 .table-container {
   background: white;
   border-radius: 20px;
@@ -678,12 +682,20 @@ export default {
   overflow: hidden;
   max-height: 400px;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Table wrapper for horizontal scroll */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
 }
 
 .modern-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  min-width: 800px; /* minimum width for detail table (more columns) */
 }
 
 .modern-table thead {
@@ -701,6 +713,7 @@ export default {
   font-size: 0.875rem;
   letter-spacing: 0.5px;
   border: none;
+  white-space: nowrap; /* prevent text wrapping in headers */
 }
 
 .modern-table td {
@@ -708,6 +721,7 @@ export default {
   border-bottom: 1px solid #f8f9fa;
   font-size: 0.875rem;
   color: #495057;
+  white-space: nowrap; /* prevent text wrapping in cells */
 }
 
 .table-row {
@@ -727,6 +741,9 @@ export default {
 .commuter-name {
   font-weight: 600;
   color: #2A67AD;
+  max-width: 150px; /* limit name width */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .carbon-value {
@@ -737,13 +754,9 @@ export default {
 .route-name {
   font-weight: 500;
   color: #495057;
-}
-
-/* Loading and Error States */
-.modern-alert {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 200px; /* limit route name width */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Responsive Design */
@@ -774,13 +787,46 @@ export default {
     text-align: center;
   }
   
+  /* Table responsive adjustments */
+  .table-container {
+    margin: 0 -1rem; /* extend to screen edges on mobile */
+    border-radius: 0; /* remove border radius on mobile for better UX */
+    max-height: 350px;
+  }
+  
   .modern-table {
+    min-width: 850px; /* ensure minimum width for proper layout (detail has more columns) */
     font-size: 0.75rem;
   }
   
   .modern-table th,
   .modern-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Adjust column widths for mobile */
+  .commuter-name {
+    max-width: 120px;
+  }
+  
+  .route-name {
+    max-width: 150px;
+  }
+  
+  /* Add scroll indicator on mobile */
+  .table-container::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(42, 103, 173, 0.1);
+    color: #2A67AD;
+    font-size: 0.75rem;
+    text-align: center;
     padding: 0.5rem;
+    font-weight: 500;
+    border-top: 1px solid rgba(42, 103, 173, 0.2);
   }
 }
 
@@ -813,11 +859,35 @@ export default {
     margin-left: 1.5rem; /* Even less margin on mobile */
     font-size: 1.2rem; /* Slightly smaller text on mobile */
   }
+  
+  /* Extra small mobile adjustments */
+  .table-container {
+    max-height: 300px;
+  }
+  
+  .modern-table {
+    min-width: 780px;
+  }
+  
+  .modern-table th,
+  .modern-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.7rem;
+  }
+  
+  .commuter-name {
+    max-width: 100px;
+  }
+  
+  .route-name {
+    max-width: 120px;
+  }
 }
 
-/* Scrollbar Styling */
+/* Enhanced Scrollbar Styling */
 .table-container::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .table-container::-webkit-scrollbar-track {
@@ -830,6 +900,25 @@ export default {
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
+  background: #1a4a7a;
+}
+
+/* Horizontal scrollbar styling */
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #2A67AD;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
   background: #1a4a7a;
 }
 </style>
