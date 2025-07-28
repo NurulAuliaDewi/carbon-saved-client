@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Dashboard from '../views/Dashboard.vue';
 import detailView from '../views/DetailView.vue';
+import LandingPage from '@/views/LandingPage.vue';
 
 
 Vue.use(VueRouter);
@@ -9,6 +10,11 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/',
+    name: 'LandingPage',
+    component: LandingPage
+  },
+  {
+    path: '/Dashboard',
     name: 'Dashboard',
     component: Dashboard
   },
@@ -16,7 +22,7 @@ const routes = [
     path: '/detail/:id',
     name: 'detailView',
     component: detailView
-  },
+  }
 ];
 
 const router = new VueRouter({
