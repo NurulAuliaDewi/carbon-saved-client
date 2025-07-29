@@ -1181,16 +1181,23 @@ export default {
   .bar-label { width: 120px; font-size: 0.9rem; }
   .scroll-indicator { display: none; }
   .athlete-stats { flex-direction: column; gap: 0.5rem; }
+  .bar-fill {
+    min-height: 20px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .landing { padding: 1rem; }
   .main-title { font-size: 2rem; }
   .summary-card { padding: 1.5rem; }
+  .bar-container {
+    min-width: 150px !important;
+  }
   .athletes-grid {
     grid-template-columns: 1fr;
     max-width: 100%;
   }
+  
   .athlete-card { 
     padding: 1rem; 
     flex-direction: column; 
