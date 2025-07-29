@@ -43,6 +43,7 @@
         <div class="period-selector">
           <button class="period-btn active" @click="changePeriod('month', $event)">Monthly</button>
           <button class="period-btn" @click="changePeriod('semester', $event)">Semester</button>
+          <button class="period-btn" @click="changePeriod('year', $event)">Yearly</button>
         </div>
 
         <div class="month-selector" v-if="currentPeriod === 'month'">
@@ -57,6 +58,14 @@
           <select v-model="selectedSemester" @change="onSemesterChange" class="semester-dropdown">
             <option value="1">Semester 1 (Jan - Jun {{ currentYear }})</option>
             <option value="2">Semester 2 (Jul - Dec {{ currentYear }})</option>
+          </select>
+        </div>
+
+        <div class="year-selector" v-if="currentPeriod === 'year'">
+          <select v-model="selectedYear" @change="onYearChange" class="year-dropdown">
+            <option v-for="year in availableYears" :key="year" :value="year">
+              {{ year }}
+            </option>
           </select>
         </div>
 
@@ -152,23 +161,12 @@ export default {
       loading: true,
       loadingAthletes: true,
       currentPeriod: 'month',
+      selectedYear: new Date().getFullYear(),
       currentYear: new Date().getFullYear(),
       selectedMonth: null, 
       selectedSemester: '1',
-      availableMonths: [
-        { value: '1', label: 'January 2024' },
-        { value: '2', label: 'February 2024' },
-        { value: '3', label: 'March 2024' },
-        { value: '4', label: 'April 2024' },
-        { value: '5', label: 'May 2024' },
-        { value: '6', label: 'June 2024' },
-        { value: '7', label: 'July 2024' },
-        { value: '8', label: 'August 2024' },
-        { value: '9', label: 'September 2024' },
-        { value: '10', label: 'October 2024' },
-        { value: '11', label: 'November 2024' },
-        { value: '12', label: 'December 2024' }
-      ],
+      availableMonths: [],
+      availableYears: [],
       stats: [
         { icon: 'fas fa-users', value: '-', label: 'Total Participants', subtitle: 'Active cyclists', key: 'total_participants' },
         { icon: 'fas fa-bicycle', value: '-', label: 'Total Rides', subtitle: 'Cycling activities', key: 'total_activities' },
@@ -190,6 +188,7 @@ export default {
   async mounted() {
     const now = new Date();
     this.selectedMonth = (now.getMonth() + 1).toString();
+    this.selectedYear = this.currentYear;
     
     await this.fetchAvailableMonths();
     await this.fetchSummaryData();
@@ -250,7 +249,7 @@ export default {
       try {
         const response = await axios.get(`${this.apiBaseUrl}/available-periods`);
         
-        if (response.data && response.data.status === 200 && response.data.data.months) {
+        if (response.data && response.data.status === 200 && response.data.data) {
           const monthNames = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
@@ -262,6 +261,9 @@ export default {
             year: item.year
           }));
           
+          // Update availableYears dari API
+          this.availableYears = response.data.data.years || [];
+          
           if (this.availableMonths.length > 0) {
             const currentMonthAvailable = this.availableMonths.find(m => m.value === this.selectedMonth);
             if (!currentMonthAvailable) {
@@ -271,6 +273,13 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching available months:', error);
+        // fallback untuk years
+        const currentYear = new Date().getFullYear();
+        const startYear = 2024;
+        this.availableYears = [];
+        for (let year = currentYear; year >= startYear; year--) {
+          this.availableYears.push(year);
+        }
       }
     },
 
@@ -292,6 +301,11 @@ export default {
           params = {
             period: 'year',
             year: this.currentYear
+          };
+        } else if (this.currentPeriod === 'year') {
+          params = {
+            period: 'year',
+            year: this.selectedYear
           };
         }
         
@@ -352,6 +366,11 @@ export default {
             period: 'semester',
             year: this.currentYear,
             semester: this.selectedSemester
+          };
+        } else if (this.currentPeriod === 'year') {
+          params = {
+            period: 'year',
+            year: this.selectedYear
           };
         }
         
@@ -452,6 +471,12 @@ export default {
     },
 
     async onMonthChange() {
+      await this.fetchSummaryData();
+      await this.fetchTopAthletes();
+    },
+
+    async onYearChange() {
+      console.log('Year changed to:', this.selectedYear); // debug
       await this.fetchSummaryData();
       await this.fetchTopAthletes();
     },
@@ -1175,5 +1200,42 @@ export default {
   .athlete-rank { margin-bottom: 1rem; }
   .chart-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
   .bar-label { width: auto; }
+}
+
+.year-selector {
+  margin-bottom: 2rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.year-dropdown {
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  color: #e0e0e0;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  min-width: 150px;
+}
+
+.year-dropdown:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.year-dropdown:focus {
+  outline: none;
+  border-color: #18cf55;
+  box-shadow: 0 0 0 3px rgba(24, 207, 85, 0.2);
+}
+
+.year-dropdown option {
+  background: #133a5a;
+  color: #e0e0e0;
+  padding: 0.5rem;
 }
 </style>
